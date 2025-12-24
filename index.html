@@ -2,8 +2,21 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monotone Unified 21:9 Clock (Large Seconds)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA設定: iOS用 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="21:9 Clock">
+
+    <!-- PWA設定: Android/PC用マニフェスト (Data URIで埋め込み) -->
+    <link rel="manifest" id="manifest-placeholder">
+
+    <!-- アイコン (Data URIで埋め込み) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E">
+    
+    <title>Monotone 21:9 Clock</title>
+    
     <style>
         /* Google Fonts: Poppins */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
@@ -16,6 +29,10 @@
             --ink-black: #1a1a1a;
             --slate-gray: #666666;
             --soft-gray: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -33,6 +50,8 @@
             overflow: hidden;
             user-select: none;
             cursor: default;
+            /* iOSでのタップハイライトを無効化 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .clock-container {
@@ -89,9 +108,8 @@
             transform: translateY(-1.5vw);
         }
 
-        /* 秒数エリア */
+        /* 秒数エリア (大きめ) */
         .seconds {
-            /* ここを大きくしました (5vw -> 7.5vw) */
             font-size: 7.5vw;
             font-weight: 600;
             color: var(--slate-gray);
@@ -148,6 +166,36 @@
     </div>
 
     <script>
+        // --- PWA Manifestの動的生成と注入 ---
+        // 外部ファイルを作らずにPWAとして認識させるための処理
+        function setupManifest() {
+            // アイコンのSVGデータ (Data URI)
+            const iconData = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E";
+
+            const manifest = {
+                "name": "Monotone 21:9 Clock",
+                "short_name": "Clock",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#f4f4f4",
+                "theme_color": "#f4f4f4",
+                "orientation": "landscape",
+                "icons": [
+                    {
+                        "src": iconData,
+                        "sizes": "512x512",
+                        "type": "image/svg+xml"
+                    }
+                ]
+            };
+
+            const stringManifest = JSON.stringify(manifest);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            document.querySelector('#manifest-placeholder').setAttribute('href', manifestURL);
+        }
+
+        // --- 時計のロジック ---
         function updateClock() {
             const now = new Date();
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -176,6 +224,8 @@
             document.getElementById('progress').style.width = `${progressPercent}%`;
         }
 
+        // 初期化実行
+        setupManifest();
         setInterval(updateClock, 30);
         updateClock();
     </script>
