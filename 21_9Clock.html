@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monotone Unified 21:9 Clock (Large Seconds)</title>
+    <style>
+        /* Google Fonts: Poppins */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+
+        :root {
+            /* モノトーン統一パレット */
+            --bg-base: #f4f4f4;
+            --bg-gradient: #ffffff;
+            
+            --ink-black: #1a1a1a;
+            --slate-gray: #666666;
+            --soft-gray: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-base);
+            background: radial-gradient(circle at center, var(--bg-gradient) 0%, var(--bg-base) 100%);
+            color: var(--ink-black);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+            cursor: default;
+        }
+
+        .clock-container {
+            width: 90vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* 日付エリア */
+        .date-section {
+            font-size: 2.5vw;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            color: var(--slate-gray);
+            margin-bottom: -1vh;
+            display: flex;
+            gap: 1.5vw;
+            opacity: 0.9;
+        }
+
+        .day-highlight {
+            font-weight: 600;
+            color: var(--ink-black);
+        }
+
+        /* 時刻エリア全体 */
+        .time-wrapper {
+            display: flex;
+            align-items: baseline;
+            line-height: 1;
+            margin-top: 1vh;
+        }
+
+        .time-section {
+            font-size: 20vw;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ink-black);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+        }
+
+        /* コロン */
+        .separator {
+            opacity: 0.15;
+            margin: 0 0.6vw; 
+            transform: translateY(-1.5vw);
+        }
+
+        /* 秒数エリア */
+        .seconds {
+            /* ここを大きくしました (5vw -> 7.5vw) */
+            font-size: 7.5vw;
+            font-weight: 600;
+            color: var(--slate-gray);
+            margin-left: 1.5vw;
+            font-variant-numeric: tabular-nums;
+            opacity: 0.8;
+        }
+
+        /* プログレスバー */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--soft-gray);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #888888, #1a1a1a);
+            width: 0%;
+            border-radius: 0 4px 4px 0;
+            transition: width 0.1s linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div class="date-section">
+            <span id="date">LOADING</span>
+            <span id="day" class="day-highlight"></span>
+        </div>
+
+        <div class="time-wrapper">
+            <div class="time-section">
+                <span id="hours">00</span>
+                <span class="separator">:</span>
+                <span id="minutes">00</span>
+            </div>
+            <div class="seconds" id="seconds">00</div>
+        </div>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const pad = (num) => String(num).padStart(2, '0');
+
+            const year = now.getFullYear();
+            const monthName = months[now.getMonth()];
+            const date = pad(now.getDate());
+            const dayName = days[now.getDay()];
+
+            const h = pad(now.getHours());
+            const m = pad(now.getMinutes());
+            const s = pad(now.getSeconds());
+
+            const ms = now.getMilliseconds();
+            const progressPercent = ((now.getSeconds() + ms / 1000) / 60) * 100;
+
+            document.getElementById('date').textContent = `${monthName} ${date}, ${year}`;
+            document.getElementById('day').textContent = dayName;
+            
+            document.getElementById('hours').textContent = h;
+            document.getElementById('minutes').textContent = m;
+            document.getElementById('seconds').textContent = s;
+
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+        }
+
+        setInterval(updateClock, 30);
+        updateClock();
+    </script>
+</body>
+</html>
