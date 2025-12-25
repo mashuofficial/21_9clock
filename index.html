@@ -48,7 +48,7 @@
 
         .main-layout {
             display: flex;
-            width: 96vw; /* 16:9向けに少し幅を確保 */
+            width: 96vw;
             height: 100vh;
             margin: 0 auto;
             align-items: center;
@@ -56,7 +56,6 @@
         }
 
         /* === 左側：時計エリア (60%) === */
-        /* 16:9だと横幅が狭くなるため、時計エリアの比率を少し調整 */
         .clock-container {
             width: 60%;
             height: 100%;
@@ -75,7 +74,7 @@
         }
 
         .date-section {
-            font-size: 2.2vw; /* 16:9用に調整 */
+            font-size: 2.2vw;
             font-weight: 500;
             letter-spacing: 0.1em;
             color: var(--slate-gray);
@@ -99,7 +98,6 @@
         }
 
         .time-section {
-            /* 16:9だと縦に余裕があるので少し小さくしないと圧迫感がある */
             font-size: 20vw; 
             font-weight: 800;
             letter-spacing: -0.05em;
@@ -132,10 +130,9 @@
         /* === 右側：ウィジェットウィンドウ (40%) === */
         .right-panel-window {
             width: 40%;
-            height: 80%; /* 上下に少し余白 */
+            height: 80%;
             position: relative;
             overflow: hidden; 
-            /* インジケーター用の余白を右側に確保 */
             padding-right: 3vw; 
             padding-left: 3vw;
             border-left: 4px solid var(--ink-black);
@@ -156,7 +153,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding-bottom: 2vh; /* 下部の余白 */
+            padding-bottom: 2vh;
         }
 
         /* --- 1枚目：天気ウィジェット --- */
@@ -170,7 +167,7 @@
         }
 
         .current-icon {
-            width: 13vw; /* 16:9用に少し大きく */
+            width: 13vw;
             height: 13vw;
             flex-shrink: 0;
         }
@@ -309,18 +306,27 @@
 
         .calendar-nav {
             display: flex;
-            gap: 1.5vw;
+            gap: 2vw; /* ボタン間の隙間も広げる */
         }
 
+        /* ボタンを大きく変更 */
         .cal-btn {
-            font-size: 2.5vw;
+            font-size: 5vw; /* 2.5vw -> 5vw へ拡大 */
             font-weight: 700;
             cursor: pointer;
             color: var(--slate-gray);
             user-select: none;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            padding: 0 1vw; /* タップしやすくするための余白 */
+            line-height: 1;
         }
-        .cal-btn:hover { color: var(--ink-black); }
+        .cal-btn:hover { 
+            color: var(--ink-black); 
+            transform: scale(1.1);
+        }
+        .cal-btn:active {
+            transform: scale(0.9);
+        }
 
         .calendar-grid {
             display: grid;
@@ -355,17 +361,17 @@
             font-weight: 700;
         }
 
-        /* インジケーター（右端の点） */
+        /* インジケーター */
         .indicators {
             position: absolute;
-            right: 0; /* padding-rightエリアに配置 */
+            right: 0;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
             gap: 1.5vh;
             z-index: 20;
-            padding-right: 5px; /* 少し余裕を持たせる */
+            padding-right: 5px;
         }
 
         .dot {
@@ -490,6 +496,7 @@
                         <div class="calendar-header-row">
                             <span class="calendar-title" id="cal-header">Month Year</span>
                             <div class="calendar-nav">
+                                <!-- 大きくしたボタン -->
                                 <div class="cal-btn" onclick="changeMonth(-1); event.stopPropagation();">&lt;</div>
                                 <div class="cal-btn" onclick="changeMonth(1); event.stopPropagation();">&gt;</div>
                             </div>
@@ -502,7 +509,7 @@
 
             </div>
 
-            <!-- インジケーター (padding領域に配置) -->
+            <!-- インジケーター -->
             <div class="indicators">
                 <div class="dot active" id="dot-0"></div>
                 <div class="dot" id="dot-1"></div>
@@ -639,14 +646,13 @@
         }
 
         // --- カレンダー ---
-        let displayDate = new Date(); // カレンダー表示用の日付
+        let displayDate = new Date(); 
 
         function renderCalendar() {
             const now = new Date();
             const year = displayDate.getFullYear();
             const month = displayDate.getMonth();
             
-            // 今日の日付確認用
             const isCurrentMonth = (now.getFullYear() === year && now.getMonth() === month);
             const todayDate = now.getDate();
 
@@ -675,7 +681,6 @@
                 const el = document.createElement('div');
                 el.className = 'cal-date';
                 el.textContent = i;
-                // 今日かつ表示中の月なら黒丸
                 if (isCurrentMonth && i === todayDate) el.classList.add('cal-today');
                 grid.appendChild(el);
             }
@@ -690,7 +695,7 @@
         const rightPanel = document.getElementById('right-panel');
         const widgetStack = document.getElementById('widget-stack');
         let startY = 0;
-        let currentWidgetIndex = 0; // 0: Weather, 1: Calendar
+        let currentWidgetIndex = 0; 
 
         rightPanel.addEventListener('touchstart', e => {
             startY = e.touches[0].clientY;
@@ -700,14 +705,10 @@
             const endY = e.changedTouches[0].clientY;
             const diff = startY - endY;
 
-            // スワイプ判定 (感度30px)
             if (Math.abs(diff) > 30) { 
                 if (diff > 0) {
-                    // 上へスワイプ (Weather -> Calendar -> Weather)
                     currentWidgetIndex = (currentWidgetIndex + 1) % 2;
                 } else {
-                    // 下へスワイプ (Calendar -> Weather -> Calendar)
-                    // (0 - 1 + 2) % 2 = 1, (1 - 1 + 2) % 2 = 0
                     currentWidgetIndex = (currentWidgetIndex - 1 + 2) % 2;
                 }
                 updateWidgetView();
