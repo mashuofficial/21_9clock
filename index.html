@@ -11,11 +11,11 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="16:9 Clock V7">
+    <meta name="apple-mobile-web-app-title" content="16:9 Clock V8">
     <link rel="manifest" id="manifest-placeholder">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E">
     
-    <title>Monotone Clock V7</title>
+    <title>Monotone Clock V8</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -55,10 +55,10 @@
             justify-content: space-between;
         }
 
-        /* === 左側：時計と天気 (58%) === */
-        /* 時計エリアを拡大 (52% -> 58%) */
+        /* === 左側：時計と天気 (60%) === */
+        /* 時計エリアを60%まで確保して余裕を持たせる */
         .left-column {
-            width: 58%;
+            width: 60%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -76,10 +76,11 @@
             flex-direction: column;
             align-items: flex-start;
             margin-bottom: 5vh;
+            /* 幅制限を解除 */
+            width: 100%;
         }
 
         .date-section {
-            /* サイズ拡大 */
             font-size: 1.8vw; 
             font-weight: 500;
             letter-spacing: 0.1em;
@@ -101,11 +102,14 @@
             align-items: baseline;
             line-height: 1;
             margin-top: 1vh;
+            /* 折り返し防止 */
+            white-space: nowrap;
         }
 
         .time-section {
-            /* 時計拡大: 17vw -> 19vw */
-            font-size: 19vw; 
+            /* 【修正】はみ出し防止のため 19vw -> 16.5vw に調整 */
+            /* 左エリア60%に対して適切な最大サイズ */
+            font-size: 16.5vw; 
             font-weight: 800;
             letter-spacing: -0.05em;
             color: var(--ink-black);
@@ -123,13 +127,13 @@
 
         .seconds {
             font-family: 'Poppins', sans-serif;
-            /* 秒数拡大 */
-            font-size: 6vw; 
+            /* 秒数もバランス調整 6vw -> 5vw */
+            font-size: 5vw; 
             font-weight: 600;
             color: var(--slate-gray);
             margin-left: 1.2vw;
             opacity: 0.8;
-            width: 8.5vw; 
+            width: 7.5vw; 
             text-align: left;
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
@@ -155,7 +159,6 @@
         }
 
         .current-icon {
-            /* 天気アイコン拡大 4.5vw -> 6.5vw */
             width: 6.5vw;
             height: 6.5vw;
         }
@@ -167,7 +170,6 @@
         }
 
         .location-label {
-            /* 拡大 */
             font-size: 0.9vw;
             font-weight: 700;
             color: var(--slate-gray);
@@ -175,7 +177,6 @@
         }
 
         .current-temp-big {
-            /* 拡大 */
             font-size: 3.8vw;
             font-weight: 700;
             line-height: 1;
@@ -193,34 +194,30 @@
             flex-direction: column;
             align-items: center;
             gap: 0.5vh;
-            /* 幅拡大 */
             width: 4.5vw; 
         }
 
         .hourly-icon {
-            /* 拡大 */
             width: 3vw;
             height: 3vw;
         }
 
         .hourly-time {
-            /* 拡大 */
             font-size: 0.9vw;
             font-weight: 600;
             color: var(--slate-gray);
         }
 
         .hourly-temp {
-            /* 拡大 */
             font-size: 1.4vw;
             font-weight: 700;
         }
 
 
-        /* === 右側：カレンダー (42%) === */
-        /* カレンダーエリアを少し狭く (48% -> 42%) */
+        /* === 右側：カレンダー (40%) === */
+        /* 時計エリア確保のため40%に調整 */
         .right-column {
-            width: 42%;
+            width: 40%;
             height: 80%;
             display: flex;
             justify-content: center;
@@ -248,7 +245,7 @@
         }
 
         .calendar-title {
-            font-size: 2vw; /* 少し小さく調整 */
+            font-size: 2.2vw;
             font-weight: 700;
             letter-spacing: 0.05em;
         }
@@ -279,17 +276,17 @@
         }
 
         .cal-day-name {
-            font-size: 1.2vw;
+            font-size: 1.3vw;
             font-weight: 600;
             color: var(--slate-gray);
             margin-bottom: 0.5vh;
         }
 
         .cal-date {
-            font-size: 1.8vw;
+            font-size: 1.9vw;
             font-weight: 500;
-            width: 3.5vw;
-            height: 3.5vw;
+            width: 3.8vw;
+            height: 3.8vw;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -422,7 +419,7 @@
             const startUrl = window.location.href + "?v=" + new Date().getTime();
             
             const manifest = {
-                "name": "Monotone V7",
+                "name": "Monotone V8",
                 "short_name": "Clock",
                 "start_url": startUrl,
                 "display": "fullscreen",
