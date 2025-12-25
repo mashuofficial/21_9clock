@@ -11,11 +11,11 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="16:9 Clock V8">
+    <meta name="apple-mobile-web-app-title" content="16:9 Clock V9">
     <link rel="manifest" id="manifest-placeholder">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E">
     
-    <title>Monotone Clock V8</title>
+    <title>Monotone Clock V9</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -56,7 +56,6 @@
         }
 
         /* === 左側：時計と天気 (65%) === */
-        /* 時計エリアをさらに拡大 (58% -> 65%) */
         .left-column {
             width: 65%;
             height: 100%;
@@ -103,7 +102,6 @@
         }
 
         .time-section {
-            /* 左側が広がったのでサイズ維持または微調整 */
             font-size: 20vw; 
             font-weight: 800;
             letter-spacing: -0.05em;
@@ -209,7 +207,6 @@
 
 
         /* === 右側：カレンダー (35%) === */
-        /* エリアを狭くして、文字サイズも縮小 */
         .right-column {
             width: 35%;
             height: 80%;
@@ -229,38 +226,41 @@
             justify-content: center;
         }
 
+        /* カレンダー上部（タイトルのみ） */
         .calendar-header-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center; /* 中央寄せ */
             width: 100%;
-            margin-bottom: 2vh;
+            margin-bottom: 1.5vh;
         }
 
         .calendar-title {
-            /* 縮小 2.2vw -> 1.8vw */
             font-size: 1.8vw; 
             font-weight: 700;
             letter-spacing: 0.05em;
         }
 
-        .calendar-nav {
+        /* カレンダー下部（ボタン） */
+        .calendar-nav-bottom {
             display: flex;
-            gap: 1.5vw;
+            justify-content: center;
+            gap: 4vw; /* ボタンの間隔を広めに */
+            margin-top: 1.5vh;
+            width: 100%;
         }
 
         .cal-btn {
-            /* 縮小 4vw -> 3vw */
-            font-size: 3vw;
+            font-size: 3.5vw;
             font-weight: 700;
             cursor: pointer;
             color: var(--slate-gray);
             user-select: none;
             transition: all 0.2s;
-            padding: 0 0.5vw;
+            padding: 0 1vw; /* タップしやすいように */
             line-height: 1;
         }
-        .cal-btn:hover { color: var(--ink-black); transform: scale(1.1); }
+        .cal-btn:hover { color: var(--ink-black); transform: scale(1.2); }
 
         .calendar-grid {
             display: grid;
@@ -271,7 +271,6 @@
         }
 
         .cal-day-name {
-            /* 縮小 1.3vw -> 1.1vw */
             font-size: 1.1vw;
             font-weight: 600;
             color: var(--slate-gray);
@@ -279,7 +278,6 @@
         }
 
         .cal-date {
-            /* 縮小 1.8vw -> 1.5vw */
             font-size: 1.5vw;
             font-weight: 500;
             width: 3vw;
@@ -394,12 +392,16 @@
             <div class="calendar-container">
                 <div class="calendar-header-row">
                     <span class="calendar-title" id="cal-header">Month Year</span>
-                    <div class="calendar-nav">
-                        <div class="cal-btn" onclick="changeMonth(-1); event.stopPropagation();">&lt;</div>
-                        <div class="cal-btn" onclick="changeMonth(1); event.stopPropagation();">&gt;</div>
-                    </div>
                 </div>
+                
                 <div class="calendar-grid" id="cal-grid">
+                    <!-- JSで生成 -->
+                </div>
+
+                <!-- ボタンを下に配置 -->
+                <div class="calendar-nav-bottom">
+                    <div class="cal-btn" onclick="changeMonth(-1); event.stopPropagation();">&lt;</div>
+                    <div class="cal-btn" onclick="changeMonth(1); event.stopPropagation();">&gt;</div>
                 </div>
             </div>
         </div>
@@ -416,7 +418,7 @@
             const startUrl = window.location.href + "?v=" + new Date().getTime();
             
             const manifest = {
-                "name": "Monotone V8",
+                "name": "Monotone V9",
                 "short_name": "Clock",
                 "start_url": startUrl,
                 "display": "fullscreen",
