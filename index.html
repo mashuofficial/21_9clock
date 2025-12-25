@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- キャッシュ対策 -->
+    <!-- キャッシュ無効化 -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -12,11 +12,11 @@
     <!-- PWA設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="21:9 Clock">
+    <meta name="apple-mobile-web-app-title" content="Standby Clock">
     <link rel="manifest" id="manifest-placeholder">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E">
     
-    <title>Monotone Clock & Weather v2</title>
+    <title>Monotone Standby Clock</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -102,7 +102,6 @@
             font-weight: 800;
             letter-spacing: -0.05em;
             color: var(--ink-black);
-            /* 重要: 数字の幅を一定にする */
             font-variant-numeric: tabular-nums;
             text-shadow: 0 10px 40px rgba(0,0,0,0.05);
             display: flex;
@@ -116,34 +115,52 @@
         }
 
         .seconds {
-            /* Poppinsに戻す */
             font-family: 'Poppins', sans-serif;
             font-size: 5.5vw; 
-            font-weight: 600; /* 太さを調整 */
+            font-weight: 600;
             color: var(--slate-gray);
             margin-left: 1.5vw;
             opacity: 0.8;
-            /* 幅を固定して文字ブレを防ぐ */
             width: 7.5vw; 
             text-align: left;
-            /* 等幅数字機能 */
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
         }
 
-        /* === 右側：天気エリア (37%) === */
-        .weather-container {
-            width: 37%; 
-            height: 75%; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; 
-            padding-left: 3vw; 
+        /* === 右側：ウィジェットウィンドウ (37%) === */
+        /* ここを「窓」にして、中身をスワイプさせる */
+        .right-panel-window {
+            width: 37%;
+            height: 75%;
+            position: relative;
+            overflow: hidden; /* はみ出した部分を隠す */
+            padding-left: 3vw;
+            /* 境界線はここで描画 */
             border-left: 4px solid var(--ink-black);
-            color: var(--ink-black);
-            animation: fadeIn 2s ease-out;
+            /* スワイプ操作のための設定 */
+            touch-action: none; 
         }
 
+        /* スライドする中身のコンテナ */
+        .widget-stack {
+            width: 100%;
+            height: 200%; /* 2枚分なので200% */
+            display: flex;
+            flex-direction: column; /* 縦並び */
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* iPhoneっぽい慣性スクロール */
+        }
+
+        /* 各ウィジェット共通 */
+        .widget-slide {
+            width: 100%;
+            height: 50%; /* 親の半分（画面の1枚分） */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-right: 1vw; /* インジケーター用の余白 */
+        }
+
+        /* --- 1枚目：天気ウィジェット --- */
         .weather-top {
             display: flex;
             align-items: center;
@@ -257,7 +274,6 @@
             font-size: 1.3vw;
             font-weight: 700;
             color: var(--slate-gray);
-            /* 時間も等幅にしておく */
             font-variant-numeric: tabular-nums;
         }
 
@@ -267,6 +283,86 @@
             font-variant-numeric: tabular-nums;
         }
 
+        /* --- 2枚目：カレンダーウィジェット --- */
+        .calendar-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-header {
+            font-size: 2.5vw;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 2vh;
+            width: 100%;
+            text-align: left;
+            padding-left: 0.5vw;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1vh 0.5vw;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cal-day-name {
+            font-size: 1.2vw;
+            font-weight: 600;
+            color: var(--slate-gray);
+            margin-bottom: 1vh;
+        }
+
+        .cal-date {
+            font-size: 1.8vw;
+            font-weight: 500;
+            width: 3.5vw;
+            height: 3.5vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        /* 今日のスタイル */
+        .cal-today {
+            background-color: var(--ink-black);
+            color: var(--bg-base);
+            font-weight: 700;
+        }
+
+        /* 右端のインジケーター（点々） */
+        .indicators {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
+            z-index: 20;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--ink-black);
+            opacity: 0.2;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .dot.active {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
         .weather-svg {
             width: 100%;
             height: 100%;
@@ -274,8 +370,6 @@
             stroke: var(--ink-black);
             stroke-width: 0.5px;
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
-        }
-        .weather-svg path, .weather-svg circle, .weather-svg line {
             stroke-linecap: round;
             stroke-linejoin: round;
         }
@@ -338,36 +432,58 @@
             </div>
         </div>
 
-        <!-- 右側：天気 -->
-        <div class="weather-container">
-            <!-- 上段 -->
-            <div class="weather-top">
-                <div class="current-icon" id="main-icon"></div>
-                <div class="current-details">
-                    <div class="location-row">
-                        <span class="location-name">SHIBATA</span>
-                        <span class="day-label" id="weather-label">TODAY</span>
+        <!-- 右側：ウィジェットウィンドウ -->
+        <div class="right-panel-window" id="right-panel">
+            
+            <!-- スライドするスタック -->
+            <div class="widget-stack" id="widget-stack">
+                
+                <!-- 1枚目：天気 -->
+                <div class="widget-slide">
+                    <div class="weather-top">
+                        <div class="current-icon" id="main-icon"></div>
+                        <div class="current-details">
+                            <div class="location-row">
+                                <span class="location-name">SHIBATA</span>
+                                <span class="day-label" id="weather-label">TODAY</span>
+                            </div>
+                            <div class="temp-row">
+                                <div class="main-temp" id="main-temp">--°</div>
+                                <div class="hl-temp-box">
+                                    <span class="hl-temp" id="max-temp">--°</span>
+                                    <span class="hl-temp low-temp" id="min-temp">--°</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="temp-row">
-                        <div class="main-temp" id="main-temp">--°</div>
-                        <div class="hl-temp-box">
-                            <span class="hl-temp" id="max-temp">--°</span>
-                            <span class="hl-temp low-temp" id="min-temp">--°</span>
+                    <div class="divider-horizontal"></div>
+                    <div class="weather-bottom" id="hourly-forecast">
+                        <div class="hourly-item"><span class="hourly-time">6</span></div>
+                        <div class="hourly-item"><span class="hourly-time">9</span></div>
+                        <div class="hourly-item"><span class="hourly-time">12</span></div>
+                        <div class="hourly-item"><span class="hourly-time">15</span></div>
+                        <div class="hourly-item"><span class="hourly-time">18</span></div>
+                    </div>
+                </div>
+
+                <!-- 2枚目：カレンダー -->
+                <div class="widget-slide">
+                    <div class="calendar-container">
+                        <div class="calendar-header" id="cal-header">Month Year</div>
+                        <div class="calendar-grid" id="cal-grid">
+                            <!-- JSで生成 -->
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <div class="divider-horizontal"></div>
-
-            <!-- 下段 -->
-            <div class="weather-bottom" id="hourly-forecast">
-                <div class="hourly-item"><span class="hourly-time">6</span></div>
-                <div class="hourly-item"><span class="hourly-time">9</span></div>
-                <div class="hourly-item"><span class="hourly-time">12</span></div>
-                <div class="hourly-item"><span class="hourly-time">15</span></div>
-                <div class="hourly-item"><span class="hourly-time">18</span></div>
+            <!-- インジケーター -->
+            <div class="indicators">
+                <div class="dot active" id="dot-0"></div>
+                <div class="dot" id="dot-1"></div>
             </div>
+
         </div>
     </div>
 
@@ -376,11 +492,12 @@
     </div>
 
     <script>
+        // --- 共通設定 ---
         function setupManifest() {
             const iconData = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E";
             const manifest = {
-                "name": "Monotone Clock v2",
-                "short_name": "Clock",
+                "name": "Monotone Standby",
+                "short_name": "Standby",
                 "start_url": ".",
                 "display": "fullscreen",
                 "background_color": "#f4f4f4",
@@ -401,6 +518,7 @@
             }
         }
 
+        // --- 時計 ---
         function updateClock() {
             const now = new Date();
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -425,8 +543,8 @@
             document.getElementById('progress').style.width = `${progressPercent}%`;
         }
 
+        // --- 天気 ---
         const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=37.9485&longitude=139.3297&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&timezone=Asia%2FTokyo";
-
         const viewboxSetting = "-10 -10 84 84";
         const icons = {
             sun: `<svg class="weather-svg" viewBox="${viewboxSetting}"><circle cx="32" cy="32" r="14" stroke="currentColor" stroke-width="5" fill="none"/><path d="M32 6V12 M32 52V58 M58 32H52 M12 32H6 M50.4 13.6L46.1 17.9 M17.9 46.1L13.6 50.4 M50.4 50.4L46.1 46.1 M17.9 17.9L13.6 13.6" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>`,
@@ -451,22 +569,17 @@
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-
                 const currentHour = new Date().getHours();
                 const isTomorrowMode = currentHour >= 19;
-
                 const labelText = isTomorrowMode ? "TOMORROW" : "TODAY";
                 const dailyIndex = isTomorrowMode ? 1 : 0;
                 
                 document.getElementById('weather-label').textContent = labelText;
-
                 const daily = data.daily;
                 const maxT = Math.round(daily.temperature_2m_max[dailyIndex]);
                 const minT = Math.round(daily.temperature_2m_min[dailyIndex]);
 
-                let mainDisplayTemp;
-                let mainDisplayIcon;
-
+                let mainDisplayTemp, mainDisplayIcon;
                 if (isTomorrowMode) {
                     mainDisplayTemp = maxT;
                     mainDisplayIcon = getWeatherDetails(daily.weather_code[1]).icon;
@@ -482,7 +595,6 @@
 
                 const hourlyContainer = document.getElementById('hourly-forecast');
                 hourlyContainer.innerHTML = ''; 
-
                 const targetHours = [6, 9, 12, 15, 18];
                 const offset = isTomorrowMode ? 24 : 0;
                 const hourlyTemps = data.hourly.temperature_2m;
@@ -494,28 +606,98 @@
                         const temp = Math.round(hourlyTemps[index]);
                         const code = hourlyCodes[index];
                         const details = getWeatherDetails(code);
-
                         const div = document.createElement('div');
                         div.className = 'hourly-item';
-                        div.innerHTML = `
-                            <div class="hourly-icon">${details.icon}</div>
-                            <span class="hourly-time">${hour}</span>
-                            <span class="hourly-temp">${temp}°</span>
-                        `;
+                        div.innerHTML = `<div class="hourly-icon">${details.icon}</div><span class="hourly-time">${hour}</span><span class="hourly-temp">${temp}°</span>`;
                         hourlyContainer.appendChild(div);
                     }
                 });
-                
-            } catch (e) {
-                console.error("Weather fetch failed", e);
+            } catch (e) { console.error("Weather fetch failed", e); }
+        }
+
+        // --- カレンダー ---
+        function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const today = now.getDate();
+
+            // 月名
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('cal-header').textContent = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('cal-grid');
+            grid.innerHTML = '';
+
+            // 曜日ヘッダー
+            const dayNames = ["S", "M", "T", "W", "T", "F", "S"];
+            dayNames.forEach(d => {
+                const el = document.createElement('div');
+                el.className = 'cal-day-name';
+                el.textContent = d;
+                grid.appendChild(el);
+            });
+
+            // 空白と日付
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const el = document.createElement('div');
+                el.className = 'cal-date';
+                el.textContent = i;
+                if (i === today) el.classList.add('cal-today');
+                grid.appendChild(el);
             }
         }
 
+        // --- スワイプ処理 ---
+        const rightPanel = document.getElementById('right-panel');
+        const widgetStack = document.getElementById('widget-stack');
+        let startY = 0;
+        let currentWidgetIndex = 0; // 0: Weather, 1: Calendar
+
+        rightPanel.addEventListener('touchstart', e => {
+            startY = e.touches[0].clientY;
+        });
+
+        rightPanel.addEventListener('touchend', e => {
+            const endY = e.changedTouches[0].clientY;
+            const diff = startY - endY;
+
+            if (Math.abs(diff) > 30) { // スワイプ感度
+                if (diff > 0) {
+                    // 上へスワイプ -> 次へ
+                    if (currentWidgetIndex < 1) currentWidgetIndex++;
+                } else {
+                    // 下へスワイプ -> 前へ
+                    if (currentWidgetIndex > 0) currentWidgetIndex--;
+                }
+                updateWidgetView();
+            }
+        });
+
+        function updateWidgetView() {
+            // スライド処理
+            widgetStack.style.transform = `translateY(-${currentWidgetIndex * 50}%)`;
+            
+            // インジケーター更新
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentWidgetIndex);
+            });
+        }
+
+        // --- 初期化 ---
         setupManifest();
         setInterval(updateClock, 30);
         updateClock();
         fetchWeather();
-        setInterval(fetchWeather, 300000); 
+        setInterval(fetchWeather, 300000);
+        renderCalendar();
     </script>
 </body>
 </html>
