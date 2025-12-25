@@ -11,11 +11,11 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="16:9 Clock V5">
+    <meta name="apple-mobile-web-app-title" content="16:9 Clock V6">
     <link rel="manifest" id="manifest-placeholder">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23f4f4f4'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%231a1a1a' stroke-width='40'/%3E%3Cline x1='256' y1='256' x2='256' y2='100' stroke='%231a1a1a' stroke-width='30' stroke-linecap='round'/%3E%3Cline x1='256' y1='256' x2='380' y2='256' stroke='%23666666' stroke-width='20' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='256' r='20' fill='%231a1a1a'/%3E%3C/svg%3E">
     
-    <title>Monotone Clock V5</title>
+    <title>Monotone Clock V6</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -55,10 +55,10 @@
             justify-content: space-between;
         }
 
-        /* === 左側：時計と天気 (56%) === */
-        /* 右側を広げるため、左側を少し狭くしました (62% -> 56%) */
+        /* === 左側：時計と天気 (52%) === */
+        /* カレンダーを左に寄せる＝左エリアを狭くする (56% -> 52%) */
         .left-column {
-            width: 56%;
+            width: 52%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -67,7 +67,7 @@
             position: relative;
             z-index: 10;
             padding-top: 5vh;
-            padding-left: 3vw; 
+            padding-left: 2vw; 
             animation: float 6s ease-in-out infinite;
         }
 
@@ -79,7 +79,6 @@
         }
 
         .date-section {
-            /* 左側が狭くなった分、少しサイズ調整 */
             font-size: 1.6vw; 
             font-weight: 500;
             letter-spacing: 0.1em;
@@ -104,8 +103,8 @@
         }
 
         .time-section {
-            /* 枠に合わせて少し縮小 16vw -> 14.5vw */
-            font-size: 14.5vw; 
+            /* 【変更点】時計拡大: 14.5vw -> 17vw */
+            font-size: 17vw; 
             font-weight: 800;
             letter-spacing: -0.05em;
             color: var(--ink-black);
@@ -123,12 +122,13 @@
 
         .seconds {
             font-family: 'Poppins', sans-serif;
-            font-size: 4.5vw; 
+            /* 【変更点】秒数も少し拡大 */
+            font-size: 5.5vw; 
             font-weight: 600;
             color: var(--slate-gray);
             margin-left: 1.2vw;
             opacity: 0.8;
-            width: 6.5vw; 
+            width: 7.5vw; 
             text-align: left;
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
@@ -138,7 +138,7 @@
         .weather-bar {
             display: flex;
             align-items: center;
-            gap: 2vw; /* アイテム数が増えたので間隔を調整 */
+            gap: 1.5vw; /* 間隔を少し詰める（左エリアが狭くなったため） */
             padding-left: 0.5vw;
             animation: fadeIn 2s ease-out;
             width: 100%;
@@ -148,10 +148,9 @@
             display: flex;
             align-items: center;
             gap: 0.8vw;
-            padding-right: 2vw;
+            padding-right: 1.5vw;
             border-right: 2px solid rgba(0,0,0,0.1);
-            /* 固定幅を確保してレイアウト崩れ防止 */
-            min-width: 14vw; 
+            min-width: 13vw; 
         }
 
         .current-icon {
@@ -182,8 +181,7 @@
         .hourly-scroll {
             display: flex;
             align-items: center;
-            /* 6個並べるために間隔を調整 */
-            gap: 1.2vw; 
+            gap: 1vw; 
         }
 
         .hourly-item {
@@ -191,7 +189,6 @@
             flex-direction: column;
             align-items: center;
             gap: 0.5vh;
-            /* 幅を少し狭める 4vw -> 3.5vw */
             width: 3.5vw; 
         }
 
@@ -212,16 +209,16 @@
         }
 
 
-        /* === 右側：カレンダー (44%) === */
-        /* 右側スペースを拡大 (38% -> 44%) */
+        /* === 右側：カレンダー (48%) === */
+        /* 左側を狭くした分、右側を広くする (44% -> 48%) -> 境界線が左に移動する */
         .right-column {
-            width: 44%;
+            width: 48%;
             height: 80%;
             display: flex;
             justify-content: center;
             align-items: center;
             border-left: 4px solid var(--ink-black);
-            padding-left: 4vw; /* 余白も増やす */
+            padding-left: 4vw;
         }
 
         .calendar-container {
@@ -231,7 +228,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* スペースが広がったので縮小解除 */
             transform: scale(1.0); 
         }
 
@@ -240,11 +236,11 @@
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 2.5vh; /* 少し広げる */
+            margin-bottom: 2.5vh;
         }
 
         .calendar-title {
-            font-size: 2.2vw; /* 少し大きく */
+            font-size: 2.2vw;
             font-weight: 700;
             letter-spacing: 0.05em;
         }
@@ -269,7 +265,7 @@
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1.2vh 0.3vw; /* 間隔を広げてゆったりさせる */
+            gap: 1.2vh 0.3vw;
             width: 100%;
             text-align: center;
         }
@@ -282,9 +278,9 @@
         }
 
         .cal-date {
-            font-size: 1.9vw; /* 少し大きく */
+            font-size: 1.9vw;
             font-weight: 500;
-            width: 3.8vw; /* クリックエリア拡大 */
+            width: 3.8vw;
             height: 3.8vw;
             display: flex;
             justify-content: center;
@@ -299,7 +295,6 @@
             font-weight: 700;
         }
 
-        /* SVG共通 */
         .weather-svg {
             width: 100%;
             height: 100%;
@@ -383,7 +378,6 @@
                 </div>
 
                 <div class="hourly-scroll" id="hourly-forecast">
-                    <!-- 21時を追加して6つ表示 -->
                     <div class="hourly-item"><span class="hourly-time">6</span></div>
                     <div class="hourly-item"><span class="hourly-time">9</span></div>
                     <div class="hourly-item"><span class="hourly-time">12</span></div>
@@ -420,7 +414,7 @@
             const startUrl = window.location.href + "?v=" + new Date().getTime();
             
             const manifest = {
-                "name": "Monotone V5",
+                "name": "Monotone V6",
                 "short_name": "Clock",
                 "start_url": startUrl,
                 "display": "fullscreen",
@@ -505,7 +499,7 @@
                 const isTomorrowMode = currentHour >= 19;
                 const offset = isTomorrowMode ? 24 : 0;
                 
-                // 21時を追加
+                // 21時まで含めた6つ
                 const targetHours = [6, 9, 12, 15, 18, 21];
                 const hourlyTemps = data.hourly.temperature_2m;
                 const hourlyCodes = data.hourly.weather_code;
